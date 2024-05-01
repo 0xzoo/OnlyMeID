@@ -5,14 +5,13 @@ import { handle } from 'frog/vercel'
 // import { introScreen } from './intro.js'
 // import { startScreen } from './start.js'
 // import { finishScreen } from './finish.js'
+// import { errorScreen } from './components/error.js'
 import { abi } from './lib/abi.js'
-// import { AIRSTACK_API_KEY } from './airstack/key.js'
 import {
   State,
   onlyMeIDAddress
 } from './lib/types.js'
 import { checkIfHasOnlyMeID, getProfileDataFromFid } from './lib/airstack.js'
-// import { errorScreen } from './components/error.js'
 
 const AIRSTACK_API_KEY = process.env.AIRSTACK_API_KEY as string
 

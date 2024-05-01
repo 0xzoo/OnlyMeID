@@ -5,6 +5,7 @@ import {
 import { onlyMeIDAddress } from "../lib/types.js"
 
 const AIRSTACK_API_KEY = process.env.AIRSTACK_API_KEY as string
+
 init(AIRSTACK_API_KEY)
 
 type Wallet = {
@@ -55,9 +56,13 @@ export async function getProfileDataFromFid(fid: number): Promise<ProfileDataRes
 
 export async function checkIfHasOnlyMeID(wallet: string) {
   const query = `
-    query MyQuery($walletAddress, $onlyMeIDAddress) {
-      Ethereum: TokenBalances(
-        input: {filter: {owner: {_eq: $walletAddress}, tokenAddress: {_eq: $onlyMeIDAddress}}, blockchain: base, limit: 1}
+    query MyQuery($wallet: Identity!, $onlyMeIDAddress: Address!) {
+      TokenBalances(
+        input: {filter: {owner: {_eq: $wallet}, tokenAddress: {_eq: $onlyMeIDAddress}
+          },
+          blockchain: base,
+          limit: 1
+        }
       ) {
         TokenBalance {
           amount
@@ -67,8 +72,12 @@ export async function checkIfHasOnlyMeID(wallet: string) {
     }
   `
 
-  const { data, error } = await fetchQuery(query, { walletAddress: wallet, onlyMeIDAddress: onlyMeIDAddress })
-  if (error) console.log('onlyMeID check error', error)
-  const hasOnlyMeID = Number(data.Ethereum.TokenBalance[0].amount)
+  const { data, error } = await fetchQuery(query, { wallet, onlyMeIDAddress })
+  if (error) {
+    console.log('onlyMeID check error', error)
+    console.log('locations', error[0].locations[0])
+  }
+
+  const hasOnlyMeID = data.TokenBalances.TokenBalance && Number(data.TokenBalances.TokenBalance.amount) || 0
   return { hasOnlyMeID, error }
 }
